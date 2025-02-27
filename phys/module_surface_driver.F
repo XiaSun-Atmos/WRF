@@ -2396,6 +2396,26 @@ CONTAINS
                ims,ime, jms,jme, kms,kme,                          &
                i_start(ij),i_end(ij),j_start(ij),j_end(ij),kts,kte,&
                ustm,ck,cka,cd,cda,isftcflx,iz0tlnd                 )
+! WA TEST ARM WFIP set fluxes here
+!                 write(6,*) 'hfx_f,lh_f,hfx_ft,lh_ft,tsk_f,tsk_ft,znt = ',hfx_force,lh_force,hfx_force_tend,lh_force_tend,tsk_force,tsk_force_tend,znt(1,1)
+               write(6,*) 'Before forcing: hfx, zol, rmol = ', hfx(1,1), zol(1,1), rmol(1,1)
+               hfx_force = hfx_force + dt*hfx_force_tend
+               lh_force  = lh_force  + dt*lh_force_tend
+               tsk_force  = tsk_force  + dt*tsk_force_tend
+               DO j = j_start(ij) , j_end(ij)
+                  DO i = i_start(ij) , i_end(ij)
+                     hfx(i,j) = hfx_force
+                     lh(i,j) = lh_force
+                     qfx(i,j) = lh_force / xlv
+                     tsk(i,j) = tsk_force
+                     znt(i,j) = 0.04
+                     if (hfx(i,j) > 0.0) then
+                        zol(i,j) = min(zol(i,j), -hfx(i,j)/300.)
+                        rmol(i,j) = zol(i,j) / (0.5*dz8w(i,1,j))
+                     endif
+                  ENDDO
+               ENDDO
+               write(6,*) 'After forcing: hfx, zol, rmol = ', hfx(1,1), zol(1,1), rmol(1,1)
          ENDIF
        ELSE
           CALL wrf_error_fatal('Lacking arguments for SFCLAY_mynn in surface driver')
