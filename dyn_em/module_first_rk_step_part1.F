@@ -1212,6 +1212,8 @@ BENCH_START(pbl_driver_tim)
      &        ,bl_mynn_edmf_mom=config_flags%bl_mynn_edmf_mom             &
      &        ,bl_mynn_edmf_tke=config_flags%bl_mynn_edmf_tke             &
      &        ,bl_mynn_mixscalars=config_flags%bl_mynn_mixscalars         &
+     &        ,bl_mynn_mixaerosols=config_flags%bl_mynn_mixaerosols       &
+     &        ,bl_mynn_mixnumcon=config_flags%bl_mynn_mixnumcon           &
      &        ,bl_mynn_output=config_flags%bl_mynn_output                 &
      &        ,bl_mynn_cloudmix=config_flags%bl_mynn_cloudmix             &
      &        ,bl_mynn_mixqt=config_flags%bl_mynn_mixqt                   &
@@ -1226,6 +1228,7 @@ BENCH_START(pbl_driver_tim)
 !    &        ,K_m=grid%K_m, K_h=grid%K_h, K_q=grid%K_q                   &
      &        ,vdfg=grid%vdfg,maxwidth=grid%maxwidth,maxMF=grid%maxmf     &
      &        ,ztop_plume=grid%ztop_plume                                 &
+     &        ,excess_h=grid%excess_h,excess_q=grid%excess_q              &    
      &        ,spp_pbl=config_flags%spp_pbl                               &
      &        ,pattern_spp_pbl=grid%pattern_spp_pbl                       &
      &        ,restart=config_flags%restart,cycling=config_flags%cycling  &
