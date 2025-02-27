@@ -832,7 +832,8 @@ BENCH_START(calc_p_rho_tim)
                             )
 
 #ifdef DM_PARALLEL
-       IF ( config_flags%bl_pbl_physics == MYNNPBLSCHEME ) THEN
+       IF ( config_flags%bl_pbl_physics == MYNNPBLSCHEME2 .OR. &
+            config_flags%bl_pbl_physics == MYNNPBLSCHEME3 ) THEN
 #        include "HALO_EM_SCALAR_E_5.inc"
        ENDIF
 #endif

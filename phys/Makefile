@@ -44,8 +44,9 @@ MODULES = \
 	module_bl_qnsepbl.o \
 	module_bl_acm.o \
         module_bl_mynnedmf_common.o \
-        module_bl_mynnedmf.o \
-        module_bl_mynnedmf_driver.o \
+	module_bl_mynn.o \
+        module_bl_mynn_v36.o \
+        module_bl_mynn_v34.o \
 	module_bl_fogdes.o \
 	module_bl_gwdo.o \
 	module_bl_gwdo_gsl.o \
