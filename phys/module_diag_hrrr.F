@@ -261,7 +261,7 @@ CONTAINS
 !                     ,ntimesteps                                      &
                      ,t,u10,v10,w,u_phy,v_phy,p,pb                    & !JOE
                      ,wspd10max                                       &
-                     ,wspd10,wspd80,LWP,IWP,SWP                       &
+                     ,wspd10,wspd80,wspd160,LWP,IWP,SWP               &
                      ,maxcldfra,maxcldfra_pbl                         & !JOE: Optional - hrrr_diagnostics =1
                      ,up_heli_max                                     & ! Optional - hrrr_diagnostics =1 
                      ,w_up_max,w_dn_max                               & ! Optional - hrrr_diagnostics =1
@@ -504,7 +504,7 @@ CONTAINS
                                                       ,refd_max  &
                ,refl_10cm_1km,refl_10cm_4km,composite_refl_10cm  &  ! dcd
                                                             ,ht  &  ! dcd
-                                     ,wspd10,wspd80,LWP,IWP,SWP  &
+                             ,wspd10,wspd80,wspd160,LWP,IWP,SWP  &
                                        ,maxcldfra,maxcldfra_pbl
 
    INTEGER ::           ntimesteps
@@ -841,6 +841,7 @@ IF (prec_acc_dt .gt. 0.) THEN
           hail_max2d(i,j)   = 0. 
           WSPD10(i,j)       =-99.
           WSPD80(i,j)       =-99.
+          WSPD160(i,j)      =-99.
           LWP(i,j)          = 0.
           IWP(i,j)          = 0.
           SWP(i,j)          = 0.
@@ -1125,6 +1126,18 @@ IF (prec_acc_dt .gt. 0.) THEN
              ENDIF
           ENDIF
 
+          !160 m WIND SPEED
+          IF (zm-ter > 160. .AND. WSPD160(i,j)==-99.) THEN
+             IF (k==kms) THEN
+                WSPD160(i,j)=SQRT(u_phy(i,k,j)**2 + v_phy(i,k,j)**2)
+             ELSE
+                wt1=(zm-ter - 160.)/depth ! portion of layer above 160 m
+                wt1=MIN(MAX(0.,wt1),1.0)
+                WSPD160(i,j)=(1.-wt1)*SQRT(u_phy(i,k,j)**2 + v_phy(i,k,j)**2) + &
+                                  wt1*SQRT(u_phy(i,k-1,j)**2 + v_phy(i,k-1,j)**2)
+             ENDIF
+          ENDIF
+          
           !JOE -add LWP, IWP & sWP & MAXCLDFRA; use temp (abs temperature in kelvin)
           dp=p8w(i,k,j)-p8w(i,k+1,j)
           IF (icloud_bl>0 .AND. PRESENT(QC_BL) .AND. &

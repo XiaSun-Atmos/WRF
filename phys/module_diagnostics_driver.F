@@ -1361,6 +1361,7 @@ END IF ! JOE: use hrrr_diagnostics OR nwp diags, not both
                 ,P=grid%p,PB=grid%pb                                 &
                 ,WSPD10MAX=grid%wspd10max                            &
                 ,WSPD10=grid%wspd10,WSPD80=grid%wspd80               & !joe-wfip
+                ,WSPD160=grid%wspd160                                &
                 ,LWP=grid%lwp2d,IWP=grid%iwp2d,SWP=grid%swp2d        & !joe-wfip
                 ,MAXCLDFRA=grid%maxcldfra                            & !joe-wfip
                 ,MAXCLDFRA_pbl=grid%maxcldfra_pbl                    &
