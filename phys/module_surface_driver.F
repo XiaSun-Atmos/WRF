@@ -939,7 +939,7 @@ CONTAINS
 ! Variables for multi-layer UCM
    REAL, OPTIONAL, INTENT(IN  )   ::                                   GMT 
    INTEGER, OPTIONAL, INTENT(IN  ) ::                               JULDAY
-   REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN   )        ::XLAT, XLONG
+   REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN)        ::XLAT, XLONG
    INTEGER , INTENT(IN)        ::     num_urban_ndm
    INTEGER , INTENT(IN)        ::     urban_map_zrd
    INTEGER , INTENT(IN)        ::     urban_map_zwd
@@ -2368,6 +2368,7 @@ CONTAINS
                cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm,            &
                znt,ust,pblh,mavail,zol,mol,regime,psim,psih,       &
                xland,hfx,qfx,lh,tsk,flhc,flqc,qgh,qsfc,rmol,       &
+               xlat,xlong,                                         & 
                u10,v10,th2,t2,q2,SNOWH,                            &
                gz1oz0,wspd,br,isfflx,dx,                           &
                svp1,svp2,svp3,svpt0,ep_1,ep_2,karman,              &
@@ -2387,6 +2388,7 @@ CONTAINS
                cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm,            &
                znt,ust,pblh,mavail,zol,mol,regime,psim,psih,       &
                xland,hfx,qfx,lh,tsk,flhc,flqc,qgh,qsfc,rmol,       &
+               xlat,xlong,                                         &
                u10,v10,th2,t2,q2,SNOWH,                            &
                gz1oz0,wspd,br,isfflx,dx,                           &
                svp1,svp2,svp3,svpt0,ep_1,ep_2,karman,              &
@@ -5229,6 +5231,7 @@ CONTAINS
               CP,G,ROVCP,R,XLV,PSFC,CHS,CHS2,CQS2,CPM,             &
               ZNT,UST,PBLH,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH,        &
               XLAND,HFX,QFX,LH,TSK,FLHC,FLQC,QGH,QSFC,RMOL,        &
+              XLAT,XLONG,                                          & 
               U10,V10,TH2,T2,Q2,SNOWH,                             &
               GZ1OZ0,WSPD,BR,ISFFLX,DX,                            &
               SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,                 &
@@ -5273,6 +5276,8 @@ CONTAINS
                INTENT(IN   )               ::             MAVAIL, &
                                                             PBLH, &
                                                            XLAND, &
+                                                           XLAT,  &
+                                                           XLONG, &
                                                              QCG, &
                                                             PSFC, &
                                                            SNOWH, &
@@ -5411,6 +5416,7 @@ CONTAINS
           CP,G,ROVCP,R,XLV,PSFC,CHS,CHS2,CQS2,CPM,            &
           ZNT,UST,PBLH,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH,       &
           XLAND,HFX,QFX,LH,TSK_LOCAL,FLHC,FLQC,QGH,QSFC,RMOL, &
+          XLAT,XLONG,                                         &
           U10,V10,TH2,T2,Q2,SNOWH,                            &
           GZ1OZ0,WSPD,BR,ISFFLX,DX,                           &
           SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,                &
@@ -5476,6 +5482,7 @@ CONTAINS
                HFX_SEA,QFX_SEA,LH_SEA,                             &
                TSK_SEA,                                            &
                FLHC_SEA,FLQC_SEA,QGH_SEA,QSFC_SEA,RMOL_SEA,        &
+               XLAT,XLONG,                                         &
                U10_SEA,V10_SEA,TH2_SEA,T2_SEA,Q2_SEA,SNOWH,        &
                GZ1OZ0_SEA,WSPD_SEA,BR_SEA,                         &
                ISFFLX,DX,                                          &

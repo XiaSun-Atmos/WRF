@@ -88,10 +88,11 @@ MODULE module_sf_mynn
                                            ! 1 = GFS
   REAL, PARAMETER    :: qvmin    = 1e-9
   !For debugging purposes:
-  LOGICAL, PARAMETER :: debug_code = .false.
+  LOGICAL, PARAMETER :: debug_code = .true.
 
   REAL,   DIMENSION(0:1000 ),SAVE :: psim_stab,psim_unstab, &
                                      psih_stab,psih_unstab
+  integer :: ios
 
 CONTAINS
 
@@ -116,6 +117,7 @@ CONTAINS
               CP,G,ROVCP,R,XLV,PSFCPA,CHS,CHS2,CQS2,CPM,    &
               ZNT,UST,PBLH,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH, &
               XLAND,HFX,QFX,LH,TSK,FLHC,FLQC,QGH,QSFC,RMOL, &
+              XLAT,XLONG,                                   &
               U10,V10,TH2,T2,Q2,SNOWH,                      &
               GZ1OZ0,WSPD,BR,ISFFLX,DX,                     &
               SVP1,SVP2,SVP3,SVPT0,EP1,EP2,                 &
@@ -250,6 +252,8 @@ CONTAINS
                 INTENT(IN   )               ::             MAVAIL, &
                                                              PBLH, &
                                                             XLAND, &
+                                                            XLAT,  &
+                                                            XLONG, &
                                                               TSK, &
                                                               QCG, &
                                                            PSFCPA ,&
@@ -309,6 +313,8 @@ CONTAINS
       jtf=MIN0(jte,jde-1)
       ktf=MIN0(kte,kde-1)
 
+      write(*,*)"======= Xia in module_sf_mynn.F "
+
       IF (debug_code) THEN
         write(0,*)"======= printing of constants:"
         write(0,*)"cp=",   cp," g=",      g
@@ -345,6 +351,7 @@ CONTAINS
               qstar(i,j)=0.0
            ENDDO
         ENDIF
+        write(*,*) "XLAT before call sfclay1d",XLAT(i,j)
 
         CALL SFCLAY1D_mynn(                                        &
                 J,U1D,V1D,T1D,QV1D,P1D,dz8w1d,rho1d,               &
@@ -354,6 +361,7 @@ CONTAINS
                 ZNT(ims,j),UST(ims,j),MAVAIL(ims,j),ZOL(ims,j),    &
                 MOL(ims,j),REGIME(ims,j),PSIM(ims,j),PSIH(ims,j),  &
                 XLAND(ims,j),HFX(ims,j),QFX(ims,j),TSK(ims,j),     &
+                XLAT(ims,j),XLONG(ims,j),                          &
                 U10(ims,j),V10(ims,j),TH2(ims,j),T2(ims,j),        &
                 Q2(ims,j),FLHC(ims,j),FLQC(ims,j),SNOWH(ims,j),    &
                 QGH(ims,j),QSFC(ims,j),LH(ims,j),                  &
@@ -383,6 +391,7 @@ CONTAINS
                      CP,G,ROVCP,R,XLV,PSFCPA,CHS,CHS2,CQS2,CPM,    &
                      PBLH,RMOL,ZNT,UST,MAVAIL,ZOL,MOL,REGIME,      &
                      PSIM,PSIH,XLAND,HFX,QFX,TSK,                  &
+                     XLAT,XLONG,                                   &
                      U10,V10,TH2,T2,Q2,FLHC,FLQC,SNOWH,QGH,        &
                      QSFC,LH,GZ1OZ0,WSPD,BR,ISFFLX,DX,             &
                      SVP1,SVP2,SVP3,SVPT0,EP1,EP2,                 &
@@ -427,6 +436,8 @@ CONTAINS
       REAL,     DIMENSION( ims:ime ), INTENT(IN)    ::     MAVAIL, &
                                                              PBLH, &
                                                             XLAND, &
+                                                            XLAT,  &
+                                                            XLONG, &
                                                               TSK, &
                                                            PSFCPA, &
                                                               QCG, &
@@ -615,9 +626,53 @@ CONTAINS
       ENDDO
 
       IF (debug_code) THEN
+        open(2, file = '/lfs5/BMC/rtwbl/Xia.Sun/mynn_dev/WRFV4.5.1_WFIP3_exp10_ci/run/input_wat_title.txt', &
+            status="new", action="write",iostat=ios)
+        if (ios /= 0) then
+            print *, "File already exists (or cannot be created). Skipping open."
+        else
+            write(2,'(A10,A10,A10,A10,'                               //&
+                    'A10,A10,'                                        //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,'                                        //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,'                                        //&
+                    'A10,A10,A10,'                                    //&
+                    'A10,A10,A10,'                                    //&
+                    'A10,A10,A10,'                                    //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,A10,'                                    //&
+                    'A10,A10,'                                        //&
+                    'A10,A10,A10,A10,'                                //&
+                    'A10,A10,A10,A10)')                                 &
+            'xlat'   ,'xlong'   ,'itimestep','pblh'   ,                 &
+            'dx', 'xland'   ,                                           & 
+            'U1D'   ,'V1D'   ,'T1D'   ,'QV1D'   ,                       & 
+            'P1D'   , 'dz8w1d'   ,'RHO1D'   , 'U1D2',                   &
+            'V1D2' , 'dz2w1d' ,                                         &
+            'pblh' , 'znt' ,'PSFCPA' ,'MAVAIL' ,                        &
+            'TSK' ,'snowh' ,                                            &
+            'chs' ,'chs2' ,'cqs2' ,                                     &
+            'ust' ,'ustm' ,'qsfc' ,                                     &
+            'u10' ,'v10' ,'th2' ,                                       &
+            't2' ,'q2' ,'flhc' ,'flqc' ,                                &
+            'lh' ,'gz1oz0' ,'WSPD' ,'br' ,                              &
+            'cpm' ,'ch' ,'rstoch1D' ,                                   &
+            'wstar' ,'qstar' ,                                          &
+            'ck' ,'cka' ,'cd' ,'cda' ,                                  &
+            'psix','psit','psix10','psit2'
+            close(2)
+        end if 
         DO i=its,ite
-           write(0,*)"===important input to mynnsfclay: i=",i," ITIME=",ITIMESTEP
-           write(0,*)"xland=",xland(i)," pblh=",pblh(i)," tsk=",tsk(i),&
+
+          write(*,*) " i=", i, " j=", J, "xland=",xland(i),"XLAT=",xlat(i), "it/1800", mod(itimestep, 100)
+          IF (xlat(i) < 41.8 .AND. xlat(i)> 41.77 .AND. xlong(i) < -67.60 .AND. xlong(i) > -67.62 &
+            .AND. mod(itimestep, 100) == 0 ) THEN
+           open(1, file = '/lfs5/BMC/rtwbl/Xia.Sun/mynn_dev/WRFV4.5.1_WFIP3_exp10_ci/run/input_wat.txt')
+           write(*,*)"===important input to mynnsfclay: i=",i," ITIME=",ITIMESTEP
+           write(*,*)"xland=",xland(i)," pblh=",pblh(i)," tsk=",tsk(i),&
              " th1=", th1d(i)," qsfc=", qsfc(i)," znt=", znt(i),       &
              " ust=", ust(i)," snowh=", snowh(i)," psfcpa=",PSFCPA(i), &
              " fluxc=",fluxc," qfx=",qfx(i)," hfx=",hfx(i),            &
@@ -625,7 +680,42 @@ CONTAINS
              " rho=",rho1d(i)," w*=",wstar(i)," dz1=",za(i),           &
              " br=",br(i)," THVGB=",THVGB(i)," DTHVDZ=",DTHVDZ,        &
              " psim_stab=",psim_stab(1)," psim_unstab=",psim_stab(1),  &
-             " psih_stab=",psih_stab(1)," psih_unstab=",psih_unstab(1)
+             " psih_stab=",psih_stab(1)," psih_unstab=",psih_unstab(1),&
+             " i=", i, " j=", J, "its=", its, "ite=", ite, "dx=", dx
+            write(1,'(F10.2,F10.2,I10,F10.2,'                         //&
+                    'F10.2,F10.2,'                                   //&
+                    'F10.2,F10.2,F10.2,F10.4,'                       //&
+                    'F10.2,F10.2,F10.2,F10.2,'                       //&
+                    'F10.2,F10.2,'                                   //&
+                    'F10.2,F10.2,F10.2,F10.2,'                       //&
+                    'F10.2,F10.2,'                                   //&
+                    'F10.2,F10.2,F10.2,'                             //&
+                    'F10.2,F10.2,F10.2,'                             //&
+                    'F10.2,F10.2,F10.2,'                             //&
+                    'F10.2,F10.2,F10.2,F10.2,'                       //&
+                    'F10.2,F10.2,F10.2,F10.2,'                       //&
+                    'F10.2,F10.2,F10.2,'                             //&
+                    'F10.2,F10.2,'                                   //&
+                    'F10.2,F10.2,F10.2,F10.2,'                       //&
+                    'F10.2,F10.2,F10.2,F10.2)')                        &
+            xlat(i),xlong(i),itimestep,pblh(i),                        &
+            dx, xland(i),                                              & 
+            U1D(i),V1D(i),T1D(i),QV1D(i),                              & 
+            P1D(i), dz8w1d(i),RHO1D(i), U1D2(i),                       &
+            V1D2(i), dz2w1d(i),                                        &
+            pblh(i), znt(i),PSFCPA(i),MAVAIL(i),                       &
+            TSK(i),snowh(i),                                           &
+            chs(i),chs2(i),cqs2(i),                                    &
+            ust(i),ustm(i),qsfc(i),                                    &
+            u10(i),v10(i),th2(i),                                      &
+            t2(i),q2(i),flhc(i),flqc(i),                               &
+            lh(i),gz1oz0(i),WSPD(i),br(i),                             &
+            cpm(i),ch(i),rstoch1D(i),                                  &
+            wstar(i),qstar(i),                                         &
+            ck(i),cka(i),cd(i),cda(i),                                 &
+            psix,psit,psix10,psit2                                      
+
+          ENDIF
         ENDDO
       ENDIF
 
