@@ -631,7 +631,7 @@ CONTAINS
         if (ios /= 0) then
             print *, "File already exists (or cannot be created). Skipping open."
         else
-            write(2,'(A10,A10,A10,A10,'                               //&
+            write(2,'(A10,A10,A10,'                                   //&
                     'A10,A10,'                                        //&
                     'A10,A10,A10,A10,'                                //&
                     'A10,A10,A10,A10,'                                //&
@@ -640,6 +640,8 @@ CONTAINS
                     'A10,A10,'                                        //&
                     'A10,A10,A10,'                                    //&
                     'A10,A10,A10,'                                    //&
+                    'A10,A10,A10,'                                    //&
+                    'A10,A10,'                                        //&
                     'A10,A10,A10,'                                    //&
                     'A10,A10,A10,A10,'                                //&
                     'A10,A10,A10,A10,'                                //&
@@ -647,7 +649,7 @@ CONTAINS
                     'A10,A10,'                                        //&
                     'A10,A10,A10,A10,'                                //&
                     'A10,A10,A10,A10)')                                 &
-            'xlat'   ,'xlong'   ,'itimestep','pblh'   ,                 &
+            'xlat'   ,'xlong'   ,'itimestep',                           &
             'dx', 'xland'   ,                                           & 
             'U1D'   ,'V1D'   ,'T1D'   ,'QV1D'   ,                       & 
             'P1D'   , 'dz8w1d'   ,'RHO1D'   , 'U1D2',                   &
@@ -656,6 +658,8 @@ CONTAINS
             'TSK' ,'snowh' ,                                            &
             'chs' ,'chs2' ,'cqs2' ,                                     &
             'ust' ,'ustm' ,'qsfc' ,                                     &
+            'rmol','zol', 'mol',                                        &
+            'hfx', 'qfx',                                               &
             'u10' ,'v10' ,'th2' ,                                       &
             't2' ,'q2' ,'flhc' ,'flqc' ,                                &
             'lh' ,'gz1oz0' ,'WSPD' ,'br' ,                              &
@@ -668,9 +672,12 @@ CONTAINS
         DO i=its,ite
 
           write(*,*) " i=", i, " j=", J, "xland=",xland(i),"XLAT=",xlat(i), "it/1800", mod(itimestep, 100)
-          IF (xlat(i) < 41.8 .AND. xlat(i)> 41.77 .AND. xlong(i) < -67.60 .AND. xlong(i) > -67.62 &
+
+
+         IF (xlat(i) < 46.54 .AND. xlat(i)> 46.53 .AND. xlong(i) < -73.53 .AND. xlong(i) > -73.535 &
             .AND. mod(itimestep, 100) == 0 ) THEN
-           open(1, file = '/lfs5/BMC/rtwbl/Xia.Sun/mynn_dev/WRFV4.5.1_WFIP3_exp10_ci/run/input_wat.txt')
+           open(4, file = '/lfs5/BMC/rtwbl/Xia.Sun/mynn_dev/WRFV4.5.1_WFIP3_exp10_ci/run_snow/input_icy.txt', &
+            status='unknown',position='append', action='write')
            write(*,*)"===important input to mynnsfclay: i=",i," ITIME=",ITIMESTEP
            write(*,*)"xland=",xland(i)," pblh=",pblh(i)," tsk=",tsk(i),&
              " th1=", th1d(i)," qsfc=", qsfc(i)," znt=", znt(i),       &
@@ -682,7 +689,7 @@ CONTAINS
              " psim_stab=",psim_stab(1)," psim_unstab=",psim_stab(1),  &
              " psih_stab=",psih_stab(1)," psih_unstab=",psih_unstab(1),&
              " i=", i, " j=", J, "its=", its, "ite=", ite, "dx=", dx
-            write(1,'(F10.2,F10.2,I10,F10.2,'                         //&
+            write(4,'(F10.2,F10.2,I10,      '                         //&
                     'F10.2,F10.2,'                                   //&
                     'F10.2,F10.2,F10.2,F10.4,'                       //&
                     'F10.2,F10.2,F10.2,F10.2,'                       //&
@@ -692,13 +699,15 @@ CONTAINS
                     'F10.2,F10.2,F10.2,'                             //&
                     'F10.2,F10.2,F10.2,'                             //&
                     'F10.2,F10.2,F10.2,'                             //&
+                    'F10.2,F10.2,'                                   //&
+                    'F10.2,F10.2,F10.2,'                             //&
                     'F10.2,F10.2,F10.2,F10.2,'                       //&
                     'F10.2,F10.2,F10.2,F10.2,'                       //&
                     'F10.2,F10.2,F10.2,'                             //&
                     'F10.2,F10.2,'                                   //&
                     'F10.2,F10.2,F10.2,F10.2,'                       //&
                     'F10.2,F10.2,F10.2,F10.2)')                        &
-            xlat(i),xlong(i),itimestep,pblh(i),                        &
+            xlat(i),xlong(i),itimestep/100,                            &
             dx, xland(i),                                              & 
             U1D(i),V1D(i),T1D(i),QV1D(i),                              & 
             P1D(i), dz8w1d(i),RHO1D(i), U1D2(i),                       &
@@ -707,6 +716,8 @@ CONTAINS
             TSK(i),snowh(i),                                           &
             chs(i),chs2(i),cqs2(i),                                    &
             ust(i),ustm(i),qsfc(i),                                    &
+            rmol(i),zol(i),mol(i),                                     &
+            hfx(i),qfx(i),                                             &
             u10(i),v10(i),th2(i),                                      &
             t2(i),q2(i),flhc(i),flqc(i),                               &
             lh(i),gz1oz0(i),WSPD(i),br(i),                             &
@@ -716,6 +727,7 @@ CONTAINS
             psix,psit,psix10,psit2                                      
 
           ENDIF
+
         ENDDO
       ENDIF
 
