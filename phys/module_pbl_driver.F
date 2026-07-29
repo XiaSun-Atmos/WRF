@@ -105,7 +105,7 @@ CONTAINS
                  ,qnbca_curr,f_qnbca                               &
              !  Optional moisture tracer flags
                  ,f_qv,f_qc,f_qr                                   &
-                 ,f_qi,f_qs,f_qg                                   &
+                 ,f_qi,f_qs,f_qg,f_qoz                             &
 ! variables added for BEP
                ,frc_urb2d                                  &
                ,a_u_bep,a_v_bep,a_t_bep,a_q_bep            &
@@ -719,7 +719,8 @@ CONTAINS
                                                      ,f_qni     & !used in CAMUWPBL
                                                      ,f_qnwfa   &
                                                      ,f_qnifa   &
-                                                     ,f_qnbca
+                                                     ,f_qnbca   &
+                                                     ,f_qoz
 
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                 &
          OPTIONAL, INTENT(INOUT) ::                              &
@@ -851,7 +852,8 @@ CONTAINS
    LOGICAL :: flag_bep
    LOGICAL :: flag_myjsfc
    LOGICAL :: flag_qv, flag_qc, flag_qr, flag_qi, flag_qs, flag_qg, &
-              flag_qnc,flag_qni, flag_qnwfa, flag_qnifa, flag_qnbca
+              flag_qnc,flag_qni, flag_qnwfa, flag_qnifa, flag_qnbca,&
+              flag_qoz
    CHARACTER*256 :: message
    REAL    :: next_bl_time
    LOGICAL :: run_param , doing_adapt_dt , decided
@@ -904,6 +906,7 @@ CONTAINS
   flag_qnwfa = .FALSE. ; IF ( PRESENT( F_QNWFA ) ) flag_qnwfa = F_QNWFA
   flag_qnifa = .FALSE. ; IF ( PRESENT( F_QNIFA ) ) flag_qnifa = F_QNIFA
   flag_qnbca = .FALSE. ; IF ( PRESENT( F_QNBCA ) ) flag_qnbca = F_QNBCA
+  flag_qoz = .FALSE. ; IF ( PRESENT( F_QOZ ) ) flag_qoz = F_QOZ
 
   if (bl_pbl_physics .eq. 0) return
 
@@ -1692,21 +1695,23 @@ CONTAINS
               end if
 
               CALL mynnedmf_driver(                                      &
-                   &initflag=initflag,restart=restart,cycling=cycling,   &
-                   &delt=dtbl,dz=dz8w,dxc=dx,znt=znt,                    &
+                   &initflag=initflag,restart=restart,                   &
+                   cycling=cycling,                                      &
+                   &delt=dtbl,dz=dz8w,dx=dx2d,znt=znt,                   &
                    &u=u_phy,v=v_phy,w=w,th=th_phy,qv=qv_curr,            &
                    &qc=qc_curr,qi=qi_curr,qs=qs_curr,                    &
                    &qnc=qnc_curr,qni=qni_curr,                           &
-                   &QNWFA=qnwfa_curr,QNIFA=qnifa_curr,QNBCA=qnbca_curr,  &
+                   &qnwfa=qnwfa_curr,qnifa=qnifa_curr,qnbca=qnbca_curr,  &
 !                   &ozone=ozone,                                         &
-                   &p=p_phy,exner=pi_phy,rho=rho,T3D=t_phy,              &
+                   &p=p_phy,exner=pi_phy,rho=rho,tk=t_phy,               &
                    &xland=xland,ts=tsk,qsfc=qsfc,ps=psfc,                &
                    &ust=ust,ch=ch,hfx=hfx,qfx=qfx,wspd=wspd,             &
                    &uoce=uoce,voce=voce,                                 & !Ocean currents
                    &Qke=qke,qke_adv=qke_adv,Sh3d=Sh3d,Sm3d=Sm3d,         &
+                   &dry_mixing_ratio=.true.,                             &
 #if (WRF_CHEM == 1)
                    &mix_chem=mynn_chem_vertmx,                           &
-                   &chem3d=chem,vd3d=vd,nchem=nchem,kdvel=kdvel,         &
+                   &chem3d=chem,vd3d=vd,nchem=nchem,kdvel=kdvel,         & ! revisit after universalize driver for mpas and wrf- Xia
                    &ndvel=ndvel,num_vert_mix=num_vert_mix,               &
 !                   &FRP_MEAN=FRP_MEAN,EMIS_ANT_NO=EMIS_ANT_NO,           & !to be included soon
 !                   &fire_turb=enh_vermix,                                & !to be included soon
@@ -1714,10 +1719,10 @@ CONTAINS
                    &Tsq=tsq,Qsq=qsq,Cov=cov,                             &
                    &RUBLTEN=rublten,RVBLTEN=rvblten,RTHBLTEN=rthblten,   &
                    &RQVBLTEN=rqvblten,RQCBLTEN=rqcblten,RQIBLTEN=rqiblten,&
-                   &RQNCBLTEN=rqncblten,RQNIBLTEN=rqniblten,             &
+                   &rqncblten=rqncblten,rqniblten=rqniblten,             &
                    &RQSBLTEN=rqsblten,                                   &
-                   &RQNWFABLTEN=rqnwfablten,RQNIFABLTEN=rqnifablten,     &
-                   &RQNBCABLTEN=rqnbcablten,                             &
+                   &rqnwfablten=rqnwfablten,rqnifablten=rqnifablten,     &
+                   &rqnbcablten=rqnbcablten,                             &
 !                   &Ro3BLTEN=ro3blten,                                   &
                    &EXCH_H=exch_h,EXCH_M=exch_m,                         &
                    &pblh=pblh,KPBL=KPBL,                                 &
@@ -1727,8 +1732,8 @@ CONTAINS
                    &qc_bl=qc_bl,qi_bl=qi_bl,cldfra_bl=cldfra_bl,         &
                    &edmf_a=edmf_a,edmf_w=edmf_w,edmf_qt=edmf_qt,         &
                    &edmf_thl=edmf_thl,edmf_ent=edmf_ent,edmf_qc=edmf_qc, &
-                   &sub_thl3D=sub_thl3D,sub_sqv3D=sub_sqv3D,             &
-                   &det_thl3D=det_thl3D,det_sqv3D=det_sqv3D,             &
+                   &sub_thl=sub_thl3D,sub_sqv=sub_sqv3D,                 &
+                   &det_thl=det_thl3D,det_sqv=det_sqv3D,                 &
                    &maxwidth=maxwidth,maxMF=maxMF,                       &
                    &ztop_plume=ztop_plume,maxmf_dd=maxmf_dd,             &
                    &maxtkeprod=maxtkeprod,cldtop_cooling=cldtop_cooling, &
@@ -1751,14 +1756,15 @@ CONTAINS
                    &bl_mynn_mixqt=bl_mynn_mixqt,                         &
                    &bl_mynn_closure=bl_mynn_closure,                     &
                    &bl_mynn_ess=bl_mynn_ess,                             &
-                   &spp_pbl=spp_pbl,pattern_spp_pbl=pattern_spp_pbl,     &
-                   &FLAG_QC=flag_qc,FLAG_QI=flag_qi,FLAG_QS=flag_qs,     &
-                   &FLAG_QNC=flag_qnc,FLAG_QNI=flag_qni,                 &
-                   &FLAG_QNWFA=flag_qnwfa,FLAG_QNIFA=flag_qnifa,         &
-                   &FLAG_QNBCA=flag_qnbca,                               &
+                   &spp_pbl=spp_pbl,pattern_spp=pattern_spp_pbl,         &
+                   &f_qc=flag_qc,f_qi=flag_qi,f_qs=flag_qs,              &
+                   &f_qnc=flag_qnc,f_qni=flag_qni,                       &
+                   &f_qnwfa=flag_qnwfa,f_qnifa=flag_qnifa,               &
+                   &f_qnbca=flag_qnbca,f_qoz=flag_qoz,                   &
                    &IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde,     &
                    &IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme,     &
-                   &ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte      )
+                   &ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte,     &
+                   &errmsg=errmsg,errflg=errflg )
 
               if (pert_mynn .and. multi_perturb == 1) then
                 call Remove_multi_perturb_pbl_perturbations (            &
