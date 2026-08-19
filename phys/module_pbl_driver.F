@@ -1708,7 +1708,6 @@ CONTAINS
                    &ust=ust,ch=ch,hfx=hfx,qfx=qfx,wspd=wspd,             &
                    &uoce=uoce,voce=voce,                                 & !Ocean currents
                    &Qke=qke,qke_adv=qke_adv,Sh3d=Sh3d,Sm3d=Sm3d,         &
-                   &dry_mixing_ratio=.true.,                             &
 #if (WRF_CHEM == 1)
                    &mix_chem=mynn_chem_vertmx,                           &
                    &chem3d=chem,vd3d=vd,nchem=nchem,kdvel=kdvel,         & ! revisit after universalize driver for mpas and wrf- Xia
