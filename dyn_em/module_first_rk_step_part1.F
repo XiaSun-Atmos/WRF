@@ -1284,6 +1284,7 @@ BENCH_START(pbl_driver_tim)
      &        ,bl_mynn_mixqt=config_flags%bl_mynn_mixqt                   &
      &        ,bl_mynn_ess=config_flags%bl_mynn_ess                       &     
      &        ,bl_mynn_closure=config_flags%bl_mynn_closure               &
+     &        ,bl_mynn_diags=config_flags%bl_mynn_diags                   &  
      &        ,edmf_a=grid%edmf_a,edmf_w=grid%edmf_w                      &
      &        ,edmf_thl=grid%edmf_thl,edmf_qt=grid%edmf_qt                &
      &        ,edmf_ent=grid%edmf_ent,edmf_qc=grid%edmf_qc                &
@@ -1296,6 +1297,10 @@ BENCH_START(pbl_driver_tim)
      &        ,ztop_plume=grid%ztop_plume,maxmf_dd=grid%maxmf_dd          &
      &        ,maxtkeprod=grid%maxtkeprod,maxwidth_dd=grid%maxwidth_dd    &
      &        ,cldtop_cooling=grid%cldtop_cooling,ent_eff=grid%ent_eff    &
+     &        ,lwp2d=grid%lwp2d,swp2d=grid%swp2d,iwp2d=grid%iwp2d         &
+     &        ,cldceil=grid%cldceil,wspd10=grid%wspd10,wspd80=grid%wspd80 &
+     &        ,wspd160=grid%wspd160,maxcldfra=grid%maxcldfra              &
+     &        ,maxcldfra_bl=grid%maxcldfra_bl                             &
      &        ,excess_h=grid%excess_h,excess_q=grid%excess_q              &    
      &        ,spp_pbl=config_flags%spp_pbl                               &
      &        ,pattern_spp_pbl=grid%pattern_spp_pbl                       &

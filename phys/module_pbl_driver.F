@@ -57,6 +57,7 @@ CONTAINS
                  ,bl_mynn_mixscalars,bl_mynn_mixaerosols           &
                  ,bl_mynn_mixnumcon,bl_mynn_output                 &
                  ,bl_mynn_cloudmix,bl_mynn_mixqt,bl_mynn_ess       &
+                 ,bl_mynn_diags                                    &
                  ,edmf_a,edmf_w,edmf_thl                           &
                  ,edmf_qt,edmf_ent,edmf_qc                         &
                  ,sub_thl3D,sub_sqv3D                              &
@@ -65,6 +66,8 @@ CONTAINS
                  ,maxwidth,maxMF,ztop_plume                        &
                  ,excess_h,excess_q                                &
                  ,maxmf_dd,maxwidth_dd,maxtkeprod                  &
+                 ,lwp2d,swp2d,iwp2d,cldceil                        &
+                 ,wspd10,wspd80,wspd160,maxcldfra,maxcldfra_bl     &
                  ,cldtop_cooling,ent_eff                           &
                  ,spp_pbl,pattern_spp_pbl                          &
               ! EEPS
@@ -605,7 +608,8 @@ CONTAINS
                                      bl_mynn_cloudmix,         &
                                      bl_mynn_mixqt,            &
                                      bl_mynn_ess,              &
-                                     tke_budget
+                                     tke_budget,               &
+                                     bl_mynn_diags
 
    REAL, OPTIONAL, INTENT(IN)  :: bl_mynn_closure
 
@@ -619,6 +623,9 @@ CONTAINS
         &    INTENT(OUT) ::          maxwidth,maxMF,ztop_plume, &
                     maxmf_dd,maxtkeprod,cldtop_cooling,ent_eff, &
                                  maxwidth_dd,excess_h,excess_q
+   REAL, OPTIONAL, DIMENSION( ims:ime , jms:jme ),              &
+        &    INTENT(INOUT) ::        lwp2d,iwp2d,swp2d,cldceil, &
+        &           wspd10,wspd80,wspd160,maxcldfra,maxcldfra_bl
 
     REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ),     &
            INTENT(INOUT) ::         qnwfa_curr,qnifa_curr,qnbca_curr
@@ -1696,7 +1703,7 @@ CONTAINS
 
               CALL mynnedmf_driver(                                      &
                    &initflag=initflag,restart=restart,                   &
-                   cycling=cycling,                                      &
+                   &cycling=cycling,                                     &
                    &delt=dtbl,dz=dz8w,dx=dx2d,znt=znt,                   &
                    &u=u_phy,v=v_phy,w=w,th=th_phy,qv=qv_curr,            &
                    &qc=qc_curr,qi=qi_curr,qs=qs_curr,                    &
@@ -1738,7 +1745,11 @@ CONTAINS
                    &maxtkeprod=maxtkeprod,cldtop_cooling=cldtop_cooling, &
                    &ent_eff=ent_eff,maxwidth_dd=maxwidth_dd,             &
                    &excess_h=excess_h,excess_q=excess_q,                 &
+                   &lwp=lwp2d,swp=swp2d,iwp=iwp2d,cldceil=cldceil,       &
+                   &wspd10=wspd10,wspd80=wspd80,wspd160=wspd160,         &
+                   &maxcldfra=maxcldfra,maxcldfra_pbl=maxcldfra_bl,      &
                    &RTHRATEN=RTHRATEN,                                   &
+                   &pint=p8w,                                            &
                    &bl_mynn_tkeadvect=bl_mynn_tkeadvect,                 &
                    &tke_budget=tke_budget,                               &
                    &bl_mynn_cloudpdf=bl_mynn_cloudpdf,                   &
@@ -1755,6 +1766,7 @@ CONTAINS
                    &bl_mynn_mixqt=bl_mynn_mixqt,                         &
                    &bl_mynn_closure=bl_mynn_closure,                     &
                    &bl_mynn_ess=bl_mynn_ess,                             &
+                   &bl_mynn_diags=bl_mynn_diags,                         &
                    &spp_pbl=spp_pbl,pattern_spp=pattern_spp_pbl,         &
                    &f_qc=flag_qc,f_qi=flag_qi,f_qs=flag_qs,              &
                    &f_qnc=flag_qnc,f_qni=flag_qni,                       &
